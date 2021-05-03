@@ -1,5 +1,12 @@
 import os
 import pandas
+import argparse
+
+
+parser = argparse.ArgumentParser()
+parser.add_argument("file", help="Path to input file.")
+parser.add_argument("type", help="Type of report to run. 1 for PODQ, 2 for SODQ.")
+args = parser.parse_args()
 
 
 def remove_extra_stuff(filename, columns_to_keep, report_type):
@@ -34,42 +41,25 @@ def remove_extra_stuff(filename, columns_to_keep, report_type):
         exit()
 
 
-def menu():
-        print("Welcome to the Daily Question Report Generator.", "\n")
-        print("For a PODQ Report, press (1)")
-        print("For an SODQ Report, press (2)")
-        # print("For a NET PODQ Report, press (3)")
-        print("Press (q) to quit.", "\n")
-        answer = input(" ")
-        if answer.lower() not in ["1", "2", "q", "test"]:
-            menu()
-        return answer.lower()
-
-
 def main():
-    while True:
-        print("_______________________________________________________")
-        type_of_report = menu()
-        if type_of_report == 'q':
-            exit()
-        target_file = input("Filename to remove extra columns from (include .csv at the end): ")
-        possible_file_names = [x.lower() for x in os.listdir("unedited")]
-        if not target_file.endswith(".csv") or target_file.lower() not in possible_file_names:
-            print("\nFile not found!", "\n")
-            main()
+    print("_______________________________________________________")
+    type_of_report = args.type
+    target_file = args.file
+    possible_file_names = [x.lower() for x in os.listdir("unedited")]
+    if not target_file.endswith(".csv") or target_file.lower() not in possible_file_names:
+        print("\nFile not found!", "\n")
+        exit()
+    if type_of_report == '1':  # Reorders and keeps what's needed for Google Drive template.
+        info_to_keep = ["Summary", "Custom field (Vendor)", "Reporter", "Status", "Created",
+                        "Resolved", "Custom field (Product Type)", "Custom field (SOS PN)"]
+    elif type_of_report == '2':
+        info_to_keep = ["Summary", "Created", "Resolved", "Custom field (Customer)", "Custom field (Product Type)",
+                        "Custom field (Return Reason)", "Custom field (SOS PN)", "Custom field (Test Result)"]
+    else:
+        exit()
 
-        if type_of_report == '1':  # Reorders and keeps what's needed for Google Drive template.
-            info_to_keep = ["Summary", "Custom field (Vendor)", "Reporter", "Status", "Created", "Resolved",
-                            "Custom field (Product Type)", "Custom field (SOS PN)"]
+    remove_extra_stuff(target_file, info_to_keep, type_of_report)
 
-        elif type_of_report == '2':
-            info_to_keep = ["Summary", "Created", "Resolved", "Custom field (Customer)", "Custom field (Product Type)",
-                            "Custom field (Return Reason)", "Custom field (SOS PN)", "Custom field (Test Result)"]
-
-        else:
-            exit()
-
-        remove_extra_stuff(target_file, info_to_keep, type_of_report)
 
 if __name__ == "__main__":
     os.makedirs('edited', exist_ok=True)
