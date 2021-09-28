@@ -1,5 +1,5 @@
 # DQ_Report_App
-Monthly DQ report app
+Takes a raw .csv file, removes unnecessary columns, and makes them into the proper format for the report. 
 1) Install requirements with pip install -r requirements.txt
 2) Create directory called unedited in project directory.
 3) Put original .csv file in unedited directory.
